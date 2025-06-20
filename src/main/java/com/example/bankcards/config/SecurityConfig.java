@@ -1,10 +1,15 @@
 //package com.example.bankcards.config;
 //
+//import lombok.RequiredArgsConstructor;
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;
+//import org.springframework.security.authentication.AuthenticationManager;
 //import org.springframework.security.config.Customizer;
+//import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+//import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 //import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 //import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+//import org.springframework.security.config.http.SessionCreationPolicy;
 //import org.springframework.security.core.userdetails.User;
 //import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,40 +17,39 @@
 //import org.springframework.security.crypto.password.PasswordEncoder;
 //import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 //import org.springframework.security.web.SecurityFilterChain;
+//import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 //
 //@Configuration
-//@EnableWebSecurity
+//@EnableMethodSecurity
+//@RequiredArgsConstructor
 //public class SecurityConfig {
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
+//
+//  //  private final JwtAuthenticationFilter jwtAuthFilter;
+//
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //        http
-//                .authorizeHttpRequests((requests) -> requests
-//                        .requestMatchers("/", "/home").permitAll()
+//                .csrf(csrf -> csrf.disable())
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/api/cards/**", "/api/users/**", "/api/transfers/**").hasAnyRole("USER", "ADMIN")
 //                        .anyRequest().authenticated()
-//                )
-//                .formLogin((form) -> form
-//                        .loginPage("/login")
-//                        .permitAll()
-//                )
-//                .logout((logout) -> logout.permitAll());
+//
+//                ).
+//            //    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 //
 //        return http.build();
 //    }
 //
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        UserDetails user =
-//                User.withDefaultPasswordEncoder()
-//                        .username("user")
-//                        .password("password")
-//                        .roles("USER")
-//                        .build();
+////    @Bean
+////    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+////        return config.getAuthenticationManager();
+////    }
 //
-//        return new InMemoryUserDetailsManager(user);
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
 //    }
 //}
-//

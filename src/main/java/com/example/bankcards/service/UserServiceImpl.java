@@ -14,7 +14,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-  // private  final PasswordEncoder passwordEncoder;
+  //private  final PasswordEncoder passwordEncoder;
 
     @Override
     public User getUserById(UUID id) {
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-      //  user.setPassword(passwordEncoder.encode(user.getPassword()));
+    //  user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.getRoles().add(Role.ROLE_USER);
         return userRepository.save(user);
     }

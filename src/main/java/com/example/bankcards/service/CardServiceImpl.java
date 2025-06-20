@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,6 +36,17 @@ public class CardServiceImpl implements CardService {
     public void deleteCard(UUID id) {
         cardRepository.deleteById(id);
     }
+
+    @Override
+    public List<Card> findAll() {
+        return cardRepository.findAll();
+    }
+
+    @Override
+    public Optional<List<Card>> findAllByUserId(UUID userId) {
+        return cardRepository.findAllByUserId(userId);
+    }
+
 
 }
 

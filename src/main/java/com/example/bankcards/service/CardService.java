@@ -7,6 +7,7 @@ import com.example.bankcards.entity.User;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface CardService {
@@ -16,4 +17,8 @@ public interface CardService {
 
     Card saveCard(Card card);
     void deleteCard(UUID id);
+
+    List<Card> findAll();
+
+    Optional<List<Card>> findAllByUserId(UUID userId);
 }

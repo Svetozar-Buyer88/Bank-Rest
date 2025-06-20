@@ -8,6 +8,7 @@ import com.example.bankcards.entity.CardStatus;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.service.CardService;
 import com.example.bankcards.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +42,8 @@ public class CardController {
     }
 
     @PostMapping
-    public ResponseEntity<CardResponse> createCard(@RequestBody CardRequest request) {
+    public ResponseEntity<CardResponse> createCard(@Valid @RequestBody CardRequest request) {
+        System.out.println(request.getCardNumber());
         User user = userService.getUserById(request.getUserId());
         Card card = Card.builder()
                 .cardNumber(request.getCardNumber())

@@ -16,6 +16,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         #
     show-sql: true
+
+jwt:secret: Rr8oW87O7L/6f+PUa9EYn0qI9dbG8pcrgicRnLwh+/c=
   #Что нужно сделать:
  # - Указать настройки подключения к базе данных.
   #- Указать порт приложения.
