@@ -219,3 +219,26 @@ Authorization: Bearer <token>
     - Совершайте переводы (`POST /api/transfers`)
 ```
 
+Пример создания карты:
+
+json
+POST /api/cards
+Authorization: Bearer <token>
+{
+  "cardNumber": "4111111111111111",
+  "ownerName": "IVAN IVANOV",
+  "expiryDate": "2026-12-31",
+  "balance": 1500.00,
+  "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+
+Пример перевода:
+
+json
+POST /api/transfers
+Authorization: Bearer <token>
+{
+  "fromCardId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "toCardId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+  "amount": 500.00
+}
