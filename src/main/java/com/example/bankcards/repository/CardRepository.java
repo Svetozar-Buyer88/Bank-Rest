@@ -20,5 +20,6 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
     @Query("SELECT c FROM Card c WHERE c.status = 'BLOCKED' AND c.balance >= 0")
     List<Card> findBlockedCardsWithPositiveBalance();
 
-
+    @Query("SELECT c FROM Card c WHERE c.user.id = :userId")
+    Page<Card> findByUserId(UUID userId, Pageable pageable);
     Page<Card> findByUser(User user, Pageable pageable);}

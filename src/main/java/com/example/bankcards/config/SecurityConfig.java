@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         // Карты
-                        .requestMatchers(HttpMethod.POST, "/api/cards").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/cards").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/cards/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/cards").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/cards/user/**").hasRole("ADMIN") // Только ADMIN
