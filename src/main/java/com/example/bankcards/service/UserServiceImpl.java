@@ -1,11 +1,17 @@
 package com.example.bankcards.service;
 
 
+import com.example.bankcards.dto.UserRequest;
+import com.example.bankcards.dto.UserResponse;
+import com.example.bankcards.dto.mapper.UserMapper;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
@@ -14,7 +20,8 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-  //private  final PasswordEncoder passwordEncoder;
+  private  final PasswordEncoder passwordEncoder;
+  private  final UserMapper userMapper;
 
     @Override
     public User getUserById(UUID id) {
@@ -30,10 +37,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-    //  user.setPassword(passwordEncoder.encode(user.getPassword()));
+      user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.getRoles().add(Role.ROLE_USER);
         return userRepository.save(user);
     }
+    @Override
+    public UserResponse createUser(UserRequest request) {
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
+        request.getRoles().add(Role.ROLE_USER);
+        return userRepository.save(request);
+    }
 
+    @Override
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable).map(userMapper::toResponse);
+    }
 
 }

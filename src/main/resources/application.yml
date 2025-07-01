@@ -6,6 +6,9 @@ spring:
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:0}
     driver-class-name: org.postgresql.Driver
+  task:
+    scheduling:
+     enabled: true
 
   jpa:
     hibernate:
@@ -18,8 +21,9 @@ spring:
     show-sql: true
 
 jwt:
-  secret: Rr8oW87O7L/6f+PUa9EYn0qI9dbG8pcrgicRnLwh+/c=
+  secret: kbcZ7HKWCEDbZzMMO8j/0TFnmV2k2bvKYyF22UQM4w8+/2dVc6fxZIIlvUJb6FSXyi8JZa2Ibd06VYchIgLvWQ==
   expiration-ms: 900000
+
   #Что нужно сделать:
  # - Указать настройки подключения к базе данных.
   #- Указать порт приложения.

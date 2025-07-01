@@ -15,12 +15,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class Card extends BaseEntity {
+
     @Id
     @GeneratedValue
     private UUID id;
 
     @Column(name = "card_number", nullable = false, unique = true)
-    private String cardNumber; // Храним зашифрованным, отображаем маской
+    private String cardNumber;
 
     @Column(name = "owner_name", nullable = false)
     private String ownerName;
@@ -36,10 +37,13 @@ public class Card extends BaseEntity {
     private BigDecimal balance;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public String getMaskedCardNumber() {
+        if (cardNumber == null || cardNumber.length() < 4) {
+            return "****";
+        }
         return "**** **** **** " + cardNumber.substring(cardNumber.length() - 4);
     }
 }

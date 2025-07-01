@@ -1,4 +1,4 @@
-package com.example.bankcards.config;
+package com.example.bankcards.security;
 
 import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.UserRepository;

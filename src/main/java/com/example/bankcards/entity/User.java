@@ -31,4 +31,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Set<Role> roles = new HashSet<>();
+
+    public boolean isAdmin() {
+        return  this.getRoles().equals("ROLE_ADMIN");
+    }
 }

@@ -18,4 +18,5 @@ public class CardResponse {
     private LocalDate expiryDate;
     private CardStatus status;
     private BigDecimal balance;
+    private UUID userId;
 }

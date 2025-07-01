@@ -1,4 +1,4 @@
-package com.example.bankcards.config.dto;
+package com.example.bankcards.dto;
 
 import lombok.*;
 

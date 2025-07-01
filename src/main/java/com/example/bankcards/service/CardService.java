@@ -1,24 +1,17 @@
 package com.example.bankcards.service;
 
+import com.example.bankcards.dto.CardRequest;
+import com.example.bankcards.dto.CardResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-
-import com.example.bankcards.entity.Card;
-import com.example.bankcards.entity.User;
-
-
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-public interface CardService {
-    Card getCardById(UUID id);
-
-    List<Card> getCardsByUser(User user);
-
-    Card saveCard(Card card);
-    void deleteCard(UUID id);
-
-    List<Card> findAll();
-
-    Optional<List<Card>> findAllByUserId(UUID userId);
+public interface CardService  {
+    CardResponse getCardById(UUID id, String currentUsername);
+    Page<CardResponse> getUserCards(String username, Pageable pageable);
+    Page<CardResponse> getUserCards(UUID userId, Pageable pageable);
+    Page<CardResponse> getAllCards(Pageable pageable);
+    CardResponse createCard(CardRequest request, String currentUsername);
+    void deleteCard(UUID id, String currentUsername);
 }

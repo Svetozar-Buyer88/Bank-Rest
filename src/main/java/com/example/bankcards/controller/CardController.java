@@ -1,22 +1,21 @@
 package com.example.bankcards.controller;
 
-
 import com.example.bankcards.dto.CardRequest;
 import com.example.bankcards.dto.CardResponse;
-import com.example.bankcards.entity.Card;
-import com.example.bankcards.entity.CardStatus;
-import com.example.bankcards.entity.User;
 import com.example.bankcards.service.CardService;
-import com.example.bankcards.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/cards")
@@ -24,54 +23,60 @@ import java.util.stream.Collectors;
 public class CardController {
 
     private final CardService cardService;
-    private final UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<CardResponse> getCard(@PathVariable UUID id) {
-        Card card = cardService.getCardById(id);
-        return ResponseEntity.ok(toResponse(card));
+    public ResponseEntity<CardResponse> getCard(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        CardResponse response = cardService.getCardById(id, userDetails.getUsername());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<Page<CardResponse>> getMyCards(
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable) {
+
+        Page<CardResponse> response = cardService.getUserCards(
+                userDetails.getUsername(),
+                pageable
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<CardResponse>> getAllCards(Pageable pageable) {
+        Page<CardResponse> response = cardService.getAllCards(pageable);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<CardResponse>> getCardsByUser(@PathVariable UUID userId) {
-        User user = userService.getUserById(userId);
-        List<CardResponse> cards = cardService.getCardsByUser(user).stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(cards);
+    public ResponseEntity<Page<CardResponse>> getUserCards(
+            @PathVariable UUID userId,
+            Pageable pageable) {
+
+        Page<CardResponse> response = cardService.getUserCards(userId, pageable);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<CardResponse> createCard(@Valid @RequestBody CardRequest request) {
-        System.out.println(request.getCardNumber());
-        User user = userService.getUserById(request.getUserId());
-        Card card = Card.builder()
-                .cardNumber(request.getCardNumber())
-                .ownerName(request.getOwnerName())
-                .expiryDate(request.getExpiryDate())
-                .status(CardStatus.ACTIVE)
-                .balance(request.getBalance())
-                .user(user)
-                .build();
-        Card saved = cardService.saveCard(card);
-        return ResponseEntity.created(URI.create("/api/cards/" + saved.getId()))
-                .body(toResponse(saved));
+    public ResponseEntity<CardResponse> createCard(
+            @Valid @RequestBody CardRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        CardResponse response = cardService.createCard(request, userDetails.getUsername());
+        return ResponseEntity
+                .created(URI.create("/api/cards/" + response.getId()))
+                .body(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCard(@PathVariable UUID id) {
-        cardService.deleteCard(id);
-        return ResponseEntity.noContent().build();
-    }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCard(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-    private CardResponse toResponse(Card card) {
-        return CardResponse.builder()
-                .id(card.getId())
-                .maskedCardNumber(card.getMaskedCardNumber())
-                .ownerName(card.getOwnerName())
-                .expiryDate(card.getExpiryDate())
-                .status(card.getStatus())
-                .balance(card.getBalance())
-                .build();
+        cardService.deleteCard(id, userDetails.getUsername());
     }
 }
