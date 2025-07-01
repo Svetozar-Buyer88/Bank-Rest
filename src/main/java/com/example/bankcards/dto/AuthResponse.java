@@ -6,5 +6,6 @@ import lombok.*;
 @AllArgsConstructor
 public class AuthResponse {
     private String token;
+    private static String tokenType = "Bearer";
 }
 

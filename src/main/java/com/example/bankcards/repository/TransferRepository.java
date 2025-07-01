@@ -12,8 +12,11 @@ import java.util.UUID;
 
 public interface TransferRepository extends JpaRepository<Transfer, UUID> {
 
-    @Query("SELECT t FROM Transfer t WHERE t.fromCard.user.id = :userId OR t.toCard.user.id = :userId")
-    Page<Transfer> findByUserId(@Param("userId") UUID userId, Pageable page);
-   // Page<Transfer> findAll(Pageable pageable);
+    @Query("SELECT t FROM Transfer t " +
+            "JOIN FETCH t.fromCard fc " +
+            "JOIN FETCH t.toCard tc " +
+            "WHERE fc.user.id = :userId OR tc.user.id = :userId")
+    Page<Transfer> findByUserId(@Param("userId") UUID userId, Pageable pageable);
+
     public Page<Transfer> findAll(Pageable page);
 }

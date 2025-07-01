@@ -4,7 +4,6 @@ package com.example.bankcards.config;
 import com.example.bankcards.security.CustomUserDetailsService;
 import com.example.bankcards.security.JwtAuthenticationFilter;
 import com.example.bankcards.security.JwtProvider;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,12 +15,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.crypto.SecretKey;
 
 @Configuration
 @EnableMethodSecurity
@@ -29,7 +25,6 @@ import javax.crypto.SecretKey;
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
-    private final JwtProvider jwtProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         // Карты
-                        .requestMatchers(HttpMethod.POST, "/api/cards").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/cards").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/cards/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/cards").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/cards/user/**").hasRole("ADMIN") // Только ADMIN
@@ -53,7 +48,8 @@ public class SecurityConfig {
 
                         // Пользователи
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
-
+                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)

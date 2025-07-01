@@ -7,9 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -24,43 +22,35 @@ public class CardController {
 
     private final CardService cardService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}")// получение карты по айди
     public ResponseEntity<CardResponse> getCard(
             @PathVariable UUID id,
             @AuthenticationPrincipal UserDetails userDetails) {
-
-        CardResponse response = cardService.getCardById(id, userDetails.getUsername());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(cardService.getCardById(id, userDetails.getUsername()));
     }
 
-    @GetMapping("/my")
+    @GetMapping("/my")// получение свои карт пользователем
     public ResponseEntity<Page<CardResponse>> getMyCards(
-            @AuthenticationPrincipal UserDetails userDetails,
-            Pageable pageable) {
-
-        Page<CardResponse> response = cardService.getUserCards(
+            @AuthenticationPrincipal UserDetails userDetails, Pageable pageable) {
+        return ResponseEntity.ok(cardService.getUserCards(
                 userDetails.getUsername(),
                 pageable
-        );
-        return ResponseEntity.ok(response);
+        ));
     }
 
-    @GetMapping
+    @GetMapping// получить все карты
     public ResponseEntity<Page<CardResponse>> getAllCards(Pageable pageable) {
-        Page<CardResponse> response = cardService.getAllCards(pageable);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(cardService.getAllCards(pageable));
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{userId}")// получить все карты пользователя по айди
     public ResponseEntity<Page<CardResponse>> getUserCards(
-            @PathVariable UUID userId,
-            Pageable pageable) {
-
-        Page<CardResponse> response = cardService.getUserCards(userId, pageable);
-        return ResponseEntity.ok(response);
+            @PathVariable UUID userId, Pageable pageable) {
+        return ResponseEntity.ok(cardService.getUserCards(userId, pageable));
     }
 
-    @PostMapping
+    @PostMapping// создать карту(может или админ для всех пользователей
+    // или пользователь только для себя
     public ResponseEntity<CardResponse> createCard(
             @Valid @RequestBody CardRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -70,13 +60,11 @@ public class CardController {
                 .created(URI.create("/api/cards/" + response.getId()))
                 .body(response);
     }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCard(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
+    @DeleteMapping("/{id}")//удаление карты
+    public ResponseEntity<Void> deleteCard(@PathVariable UUID id,
+                                           @AuthenticationPrincipal UserDetails userDetails) {
         cardService.deleteCard(id, userDetails.getUsername());
+        return ResponseEntity.noContent().build();
     }
+
 }

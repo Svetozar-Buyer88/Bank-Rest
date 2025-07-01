@@ -7,7 +7,8 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.CardStatus;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.AccessDeniedException;
-import com.example.bankcards.exception.ResourceNotFoundException;
+import com.example.bankcards.exception.CardNotFoundException;
+import com.example.bankcards.exception.UserNotFoundException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -34,8 +36,6 @@ public class CardServiceImpl implements CardService {
         checkCardAccess(card, currentUsername);
         return cardMapper.toResponse(card);
     }
-
-
 
     @Override
     @Transactional(readOnly = true)
@@ -63,19 +63,22 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public CardResponse createCard(CardRequest request, String currentUsername) {
-//        User currentUser = findUserByUsernameOrThrow(currentUsername);
-//
-//      //   Проверка прав: только админ может создавать карты для других пользователей
-//        if (!request.getUserId().equals(currentUser.getId()) && !currentUser.isAdmin()) {
-//            throw new AccessDeniedException("Only admins can create cards for other users");
-//        }
-
+        User currentUser = findUserByUsernameOrThrow(currentUsername);
         User cardUser = findUserByIdOrThrow(request.getUserId());
+
+        if (!currentUser.getId().equals(cardUser.getId()) && !currentUser.isAdmin()) {
+            throw new AccessDeniedException("Cannot create card for another user");
+        }
+        validateBalance(request.getBalance());
+
+        // Очищаем номер карты от нецифровых символов
+        String cleanedCardNumber = request.getCardNumber().replaceAll("\\D", "");
+        request.setCardNumber(cleanedCardNumber);
+
         Card card = buildCardFromRequest(request, cardUser);
         Card savedCard = cardRepository.save(card);
         return cardMapper.toResponse(savedCard);
     }
-
     @Override
     @Transactional
     public void deleteCard(UUID id, String currentUsername) {
@@ -86,22 +89,21 @@ public class CardServiceImpl implements CardService {
 
     private Card findCardOrThrow(UUID id) {
         return cardRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
+                .orElseThrow(() -> new CardNotFoundException("Card not found"));
     }
 
     private User findUserByUsernameOrThrow(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     private User findUserByIdOrThrow(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     private void checkCardAccess(Card card, String currentUsername) {
         User currentUser = findUserByUsernameOrThrow(currentUsername);
-
         if (!card.getUser().getId().equals(currentUser.getId()) && !currentUser.isAdmin()) {
             throw new AccessDeniedException("Access to card denied");
         }
@@ -122,5 +124,10 @@ public class CardServiceImpl implements CardService {
         return request.getExpiryDate().isBefore(LocalDate.now())
                 ? CardStatus.EXPIRED
                 : CardStatus.ACTIVE;
+    }
+    private void validateBalance(BigDecimal balance) {
+        if (balance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Balance cannot be negative");
+        }
     }
 }
