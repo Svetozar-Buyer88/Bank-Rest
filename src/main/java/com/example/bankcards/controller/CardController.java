@@ -67,4 +67,22 @@ public class CardController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/block")
+    public ResponseEntity<CardResponse> blockCard(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(
+                cardService.blockedCard(id, userDetails.getUsername())
+        );
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<CardResponse> activateCard(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(
+                cardService.activateCard(id, userDetails.getUsername())
+        );
+    }
+
 }

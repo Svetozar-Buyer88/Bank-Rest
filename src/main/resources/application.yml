@@ -1,31 +1,48 @@
-#
-# application.yml — главный конфигурационный файл Spring Boot.
+
 spring:
+
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:Bank}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:0}
     driver-class-name: org.postgresql.Driver
+
+
   task:
     scheduling:
-     enabled: true
+      enabled: true
+
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        #
+    open-in-view: false
     show-sql: true
+
+
+  flyway:
+   enabled: true
+   locations: classpath:db/migration
+   baseline-on-migrate: true
+   validate-on-migrate: true
+
 
 jwt:
   secret: kbcZ7HKWCEDbZzMMO8j/0TFnmV2k2bvKYyF22UQM4w8+/2dVc6fxZIIlvUJb6FSXyi8JZa2Ibd06VYchIgLvWQ==
   expiration-ms: 900000
 
-  #Что нужно сделать:
- # - Указать настройки подключения к базе данных.
-  #- Указать порт приложения.
-  #- Настроить параметры безопасности и JWT.
-  #- Включить Swagger UI.
+
+logging:
+  charset:
+    console: UTF-8
+
+file:
+  encoding: UTF-8
+
+
+admin:
+  username: admin
+  password: admin88admin

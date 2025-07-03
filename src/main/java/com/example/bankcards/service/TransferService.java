@@ -52,7 +52,18 @@ public class TransferService {
         // Выполнение перевода с блокировкой
         return performTransfer(fromCard, toCard, request.getAmount());
     }
+    public Page<TransferResponse> getTransfersByCard(UUID cardId, String currentUsername, Pageable pageable) {
+        Card card = findCardOrThrow(cardId);
+        User currentUser = userService.getUserByUsername(currentUsername);
 
+        // Проверка доступа: пользователь должен быть владельцем карты или админом
+        if (!card.getUser().getId().equals(currentUser.getId()) && !currentUser.isAdmin()) {
+            throw new AccessDeniedException("You don't have access to this card's transfers");
+        }
+
+        return transferRepository.findByCardId(cardId, pageable)
+                .map(transferMapper::toResponse);
+    }
     private TransferResponse performTransfer(Card fromCard, Card toCard, BigDecimal amount) {
         // Оптимистичная блокировка через версию
         fromCard.setBalance(fromCard.getBalance().subtract(amount));

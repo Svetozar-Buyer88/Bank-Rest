@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "transfers")
@@ -25,19 +24,4 @@ public class Transfer extends BaseEntity{
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    // Getters and setters
-//    public UUID getId() { return id; }
-//    public void setId(UUID id) { this.id = id; }
-//
-//    public Card getFromCard() { return fromCard; }
-//    public void setFromCard(Card fromCard) { this.fromCard = fromCard; }
-//
-//    public Card getToCard() { return toCard; }
-//    public void setToCard(Card toCard) { this.toCard = toCard; }
-//
-//    public BigDecimal getAmount() { return amount; }
-//    public void setAmount(BigDecimal amount) { this.amount = amount; }
-//
-//    public LocalDateTime getTimestamp() { return timestamp; }
-//    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 }

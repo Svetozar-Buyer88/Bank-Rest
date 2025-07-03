@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Entity
 @Table(name = "cards")
@@ -15,10 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class Card extends BaseEntity {
-
-    @Id
-    @GeneratedValue
-    private UUID id;
 
     @Column(name = "card_number", nullable = false, unique = true)
     private String cardNumber;

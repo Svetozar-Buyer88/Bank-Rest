@@ -18,5 +18,6 @@ public interface TransferRepository extends JpaRepository<Transfer, UUID> {
             "WHERE fc.user.id = :userId OR tc.user.id = :userId")
     Page<Transfer> findByUserId(@Param("userId") UUID userId, Pageable pageable);
 
-    public Page<Transfer> findAll(Pageable page);
+    @Query("SELECT t FROM Transfer t WHERE t.fromCard.id = :cardId OR t.toCard.id = :cardId")
+    Page<Transfer> findByCardId(@Param("cardId") UUID cardId, Pageable pageable);
 }

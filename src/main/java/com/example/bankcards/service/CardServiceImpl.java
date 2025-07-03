@@ -6,12 +6,12 @@ import com.example.bankcards.dto.mapper.CardMapper;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.CardStatus;
 import com.example.bankcards.entity.User;
-import com.example.bankcards.exception.AccessDeniedException;
-import com.example.bankcards.exception.CardNotFoundException;
-import com.example.bankcards.exception.UserNotFoundException;
+import com.example.bankcards.exception.*;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,10 +24,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CardServiceImpl implements CardService {
-
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final CardMapper cardMapper;
+    Logger log = LogManager.getLogger();
 
     @Override
     @Transactional(readOnly = true)
@@ -75,6 +75,12 @@ public class CardServiceImpl implements CardService {
         String cleanedCardNumber = request.getCardNumber().replaceAll("\\D", "");
         request.setCardNumber(cleanedCardNumber);
 
+if(cardRepository.existsByCardNumber(cleanedCardNumber)){
+    throw new CardExistsException("Card with number ending with "
+            + cleanedCardNumber.substring(cleanedCardNumber.length() - 4)
+            + " already exists");
+}
+
         Card card = buildCardFromRequest(request, cardUser);
         Card savedCard = cardRepository.save(card);
         return cardMapper.toResponse(savedCard);
@@ -85,6 +91,46 @@ public class CardServiceImpl implements CardService {
         Card card = findCardOrThrow(id);
         checkCardAccess(card, currentUsername);
         cardRepository.delete(card);
+    }
+
+
+
+    @Override
+    public CardResponse blockedCard(UUID id, String currentUsername) {
+        Card card=cardRepository.findById(id).orElseThrow();
+        if (card.getStatus() == CardStatus.BLOCKED) {
+            throw new CardOperationException("Card is already blocked");
+        }
+
+        if (card.getStatus() == CardStatus.EXPIRED) {
+            throw new CardOperationException("Cannot block expired card");
+        }
+        card.setStatus(CardStatus.BLOCKED);
+        cardRepository.save(card);
+
+        log.info("Card {} blocked by user {}", card.getMaskedCardNumber(), currentUsername);
+        return cardMapper.toResponse(card);
+    }
+
+    @Override
+    @Transactional
+    public CardResponse activateCard(UUID cardId, String currentUsername)  {
+        Card card = findCardOrThrow(cardId);
+        checkCardAccess(card, currentUsername);
+
+        if (card.getStatus() == CardStatus.ACTIVE) {
+            throw new CardOperationException("Card is already active");
+        }
+
+        if (card.getExpiryDate().isBefore(LocalDate.now())) {
+            throw new CardOperationException("Cannot activate expired card");
+        }
+
+        card.setStatus(CardStatus.ACTIVE);
+        cardRepository.save(card);
+
+        log.info("Card {} activated by user {}", card.getMaskedCardNumber(), currentUsername);
+        return cardMapper.toResponse(card);
     }
 
     private Card findCardOrThrow(UUID id) {

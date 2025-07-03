@@ -3,7 +3,6 @@ package com.example.bankcards.config;
 
 import com.example.bankcards.security.CustomUserDetailsService;
 import com.example.bankcards.security.JwtAuthenticationFilter;
-import com.example.bankcards.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +32,7 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))// отключаем харнение http сессий
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth//register-admin").hasRole("ADMIN")
                         // Карты
                         .requestMatchers(HttpMethod.POST, "/api/cards").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/cards/**").hasRole("ADMIN")
@@ -40,11 +40,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/cards/user/**").hasRole("ADMIN") // Только ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/cards/my").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/cards/{id}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/cards/{id}/**").hasAnyRole("USER", "ADMIN")
 
                         // Переводы
                         .requestMatchers(HttpMethod.POST, "/api/transfers").hasAnyRole("USER","ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/transfers").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/transfers/user/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/transfers/card/**").hasAnyRole("USER", "ADMIN")
 
                         // Пользователи
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")

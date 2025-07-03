@@ -2,9 +2,7 @@ package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.TransferRequest;
 import com.example.bankcards.dto.TransferResponse;
-import com.example.bankcards.dto.mapper.TransferMapper;
 import com.example.bankcards.service.TransferService;
-import com.example.bankcards.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +21,7 @@ public class TransferController {
 
 
     @PostMapping
+    //todo сделать ошибку для  localhost:8080/api/transfers post распознавания существования айди карт
     public ResponseEntity<TransferResponse> transfer(@RequestBody TransferRequest transferRequest,
                                              @AuthenticationPrincipal UserDetails userDetails) {
         // Извлекаем имя пользователя из UserDetails
@@ -44,5 +43,15 @@ public class TransferController {
         return ResponseEntity.ok(
                 transferService.getTransfersByUser(userId, pageable));
     }
+    @GetMapping("/card/{cardId}")
+    public ResponseEntity<Page<TransferResponse>> getTransfersByCard(
+            @PathVariable UUID cardId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable) {
+        return ResponseEntity.ok(
+                transferService.getTransfersByCard(cardId, userDetails.getUsername(), pageable)
+        );
+    }
+
     }
 
