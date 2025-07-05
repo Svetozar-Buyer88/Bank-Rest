@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -55,7 +56,11 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<CardResponse> getAllCards(Pageable pageable) {
+    public Page<CardResponse> getAllCards(Pageable pageable, String currentUsername) {
+        User currentUser = findUserByUsernameOrThrow(currentUsername);
+        if (!currentUser.isAdmin()) {
+            throw new AccessDeniedException("Only admin can view all cards");
+        }
         return cardRepository.findAll(pageable)
                 .map(cardMapper::toResponse);
     }

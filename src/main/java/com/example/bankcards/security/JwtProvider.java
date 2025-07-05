@@ -38,26 +38,4 @@ public class JwtProvider {
                 .signWith(secretKey, SignatureAlgorithm.HS512) // Используем HS512
                 .compact();
     }
-
-//    public boolean validateToken(String token) {
-//        try {
-//            Jwts.parser()
-//                    .setSigningKey(secretKey)
-//                    .build()
-//                    .parseClaimsJws(token);
-//            return true;
-//        } catch (JwtException | IllegalArgumentException e) {
-//            System.out.println("Invalid JWT token: {},"+ e.getMessage());
-//            return false;
-//        }
-//    }
-//
-//    public String getUsernameFromToken(String token) {
-//        return Jwts.parser()
-//                .setSigningKey(secretKey)
-//                .build()
-//                .parseClaimsJws(token)
-//                .getBody()
-//                .getSubject();
-//    }
 }

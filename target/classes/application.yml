@@ -10,7 +10,7 @@ spring:
 
   task:
     scheduling:
-     enabled: true
+      enabled: true
 
 
   jpa:
@@ -36,12 +36,13 @@ jwt:
 
 
 logging:
- charset:
-  console: UTF-8
+  charset:
+    console: UTF-8
+
 file:
- encoding: UTF-8
+  encoding: UTF-8
 
 
 admin:
- username: admin
- password: admin88admin
+  username: admin
+  password: admin88admin

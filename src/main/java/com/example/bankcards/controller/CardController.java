@@ -39,8 +39,9 @@ public class CardController {
     }
 
     @GetMapping// получить все карты
-    public ResponseEntity<Page<CardResponse>> getAllCards(Pageable pageable) {
-        return ResponseEntity.ok(cardService.getAllCards(pageable));
+    public ResponseEntity<Page<CardResponse>> getAllCards(Pageable pageable,
+                                                          @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(cardService.getAllCards(pageable, userDetails.getUsername()));
     }
 
     @GetMapping("/user/{userId}")// получить все карты пользователя по айди

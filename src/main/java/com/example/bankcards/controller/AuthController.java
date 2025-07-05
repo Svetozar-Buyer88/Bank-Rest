@@ -18,19 +18,19 @@ public class AuthController {
 
     private final AuthServiceImpl authService;
 
-    @PostMapping("/login")// войти в систему получить токе
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody(required = false) AuthRequest request) {
+    @PostMapping("/login")// войти в систему получить токен
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping("/register")// зарегаться получить токен
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody(required = false) AuthRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(authService.registerUser(request, Role.ROLE_USER));
     }
 
     @PostMapping("/register-admin")// регистрация админа доступна всем
-    public ResponseEntity<AuthResponse> registerAdmin(@Valid @RequestBody(required = false) AuthRequest request) {
+    public ResponseEntity<AuthResponse> registerAdmin(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(authService.registerUser(request, Role.ROLE_ADMIN));
     }

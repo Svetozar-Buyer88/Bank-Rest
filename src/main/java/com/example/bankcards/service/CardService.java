@@ -13,7 +13,7 @@ public interface CardService  {
     CardResponse getCardById(UUID id, String currentUsername);
     Page<CardResponse> getUserCards(String username, Pageable pageable);
     Page<CardResponse> getUserCards(UUID userId, Pageable pageable);
-    Page<CardResponse> getAllCards(Pageable page);
+    Page<CardResponse> getAllCards(Pageable page, String currentUsername);
     CardResponse createCard(CardRequest request, String currentUsername);
     void deleteCard(UUID id, String currentUsername);
 
